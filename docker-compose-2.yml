@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  drupal:
+    image: bitnami/drupal:latest
+    ports:
+      - '8080:8080'
+    volumes:
+      - drupal_data:/bitnami
+
+  mariadb:
+    image: bitnami/mariadb:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=YAM428
+      - MARIADB_PASSWORD=DATABASE
+      - MARIADB_DATABASE=final
+    volumes:
+      - mariadb_data:/bitnami
+
+  nginx:
+    image: nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - nginx_conf:/etc/nginx/conf.d
+      - certbot_data:/etc/letsencrypt
+      - certbot_log:/var/log/letsencrypt
+      - certbot_www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot_data:/etc/letsencrypt
+      - certbot_log:/var/log/letsencrypt
+      - certbot_www:/var/www/certbot
+    command: certonly --webroot --webroot-path=/var/www/certbot --email your_email@example.com --agree-tos --no-eff-email -d your_domain.com
+
+volumes:
+  drupal_data:
+  mariadb_data:
+  nginx_conf:
+  certbot_data:
+  certbot_log:
+  certbot_www:
